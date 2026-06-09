@@ -1,9 +1,2 @@
 .env
-/.env
-nginx/certs/
 nginx/certs/*
-*.key
-*.crt
-*.log
-__pycache__/
-*.pyc
