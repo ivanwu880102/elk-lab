@@ -1,0 +1,97 @@
+services:
+
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.3
+    container_name: es01
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.enrollment.enabled=false
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    volumes:
+      - esdata01:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+    restart: unless-stopped
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.17.3
+    container_name: kibana
+    environment:
+      - KIBANA_SERVICE_TOKEN=${KIBANA_SERVICE_TOKEN}
+    volumes:
+      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+    depends_on:
+      - es01
+    networks:
+      - elastic
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-kibana
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/.htpasswd:/etc/nginx/.htpasswd
+      - ./nginx/certs:/etc/nginx/certs
+    depends_on:
+      - kibana
+    networks:
+      - elastic
+    restart: unless-stopped
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.17.3
+    container_name: filebeat
+    user: root
+    volumes:
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: filebeat -e --strict.perms=false
+    depends_on:
+      - es01
+    networks:
+      - elastic
+    restart: unless-stopped
+
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:8.17.3
+    container_name: metricbeat
+    user: root
+    volumes:
+      - ./metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
+      - /proc:/hostfs/proc:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /:/hostfs:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: metricbeat -e --strict.perms=false
+    depends_on:
+      - es01
+    networks:
+      - elastic
+    restart: unless-stopped
+
+  alert-worker:
+    build: ./alert-worker
+    container_name: alert-worker
+
+    depends_on:
+      - es01
+
+    networks:
+      - elastic
+
+    restart: unless-stopped
+
+networks:
+  elastic:
+
+volumes:
+  esdata01:

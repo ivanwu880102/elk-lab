@@ -1,0 +1,22 @@
+metricbeat.modules:
+
+- module: system
+  period: 10s
+
+  metricsets:
+    - cpu
+    - memory
+    - network
+    - process
+    - filesystem
+    - fsstat
+
+  enabled: true
+
+output.elasticsearch:
+  hosts: ["http://es01:9200"]
+  username: elastic
+  password: 2603036
+
+setup.kibana:
+  host: "kibana:5601"

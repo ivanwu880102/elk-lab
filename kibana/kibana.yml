@@ -1,0 +1,9 @@
+server.host: "0.0.0.0"
+server.publicBaseUrl: "https://kibana.lab.local"
+
+elasticsearch.hosts: ["http://es01:9200"]
+elasticsearch.serviceAccountToken: "${KIBANA_SERVICE_TOKEN}"
+
+xpack.encryptedSavedObjects.encryptionKey: "4075fb35bb1a01cce7e88a1df3dde10b"
+xpack.reporting.encryptionKey: "b5084ca7f196ef0d438db08a973ba194"
+xpack.security.encryptionKey: "fb39f0ae34b5fbe91af7bf918117dce2"
