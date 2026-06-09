@@ -59,7 +59,7 @@
 6. 啟動完整 Stack
 
    ```bash
-   docker-compose up -d kibana nginx filebeat metricbeat
+   docker-compose up -d kibana nginx filebeat metricbeat alert-worker
    ```
 
    或者直接啟動全部服務：

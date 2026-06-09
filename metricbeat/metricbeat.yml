@@ -16,7 +16,7 @@ metricbeat.modules:
 output.elasticsearch:
   hosts: ["http://es01:9200"]
   username: elastic
-  password: 2603036
+  password: "你的Elastic密碼"
 
 setup.kibana:
   host: "kibana:5601"
