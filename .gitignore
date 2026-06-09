@@ -1,2 +1,3 @@
 .env
 nginx/certs/*
+alert-worker/alert_worker_comments.py
